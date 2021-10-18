@@ -1,32 +1,19 @@
-# Prerequisites
-*.d
+Library/
+DxLib_VC/
+Debug/
+Release/
+res/
+.vs/
+Assets/
+gslib_2021/
+Fexe/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+#コミットに含まない拡張子
+*.vcxproj.user
+*.sdf
+*.suo
+*.VC.opendb
 *.exe
-*.out
-*.app
+
+#含まないファイル
+Log.txt
