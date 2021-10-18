@@ -143,7 +143,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\Actor.cpp" />
+    <ClCompile Include="Actor\ActorManager.cpp" />
+    <ClCompile Include="Actor\AttackCollider\AttackCollider.cpp" />
+    <ClCompile Include="Animation\AnimatedMesh\AnimatedMesh.cpp" />
+    <ClCompile Include="Camera\CameraTPS.cpp" />
+    <ClCompile Include="CollisionDetection\BoundingSphere\BoundingSphere.cpp" />
+    <ClCompile Include="Field\Field.cpp" />
+    <ClCompile Include="Light\Light.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NumberTexture\NumberTexture.cpp" />
+    <ClCompile Include="Scene\SceneManager.cpp" />
+    <ClCompile Include="World\World.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Actor\Actor.h" />
+    <ClInclude Include="Actor\ActorManager.h" />
+    <ClInclude Include="Actor\AttackCollider\AttackCollider.h" />
+    <ClInclude Include="Animation\AnimatedMesh\AnimatedMesh.h" />
+    <ClInclude Include="AssetsID\Assets.h" />
+    <ClInclude Include="Camera\CameraTPS.h" />
+    <ClInclude Include="CollisionDetection\BoundingSphere\BoundingSphere.h" />
+    <ClInclude Include="CollisionDetection\Line\Line.h" />
+    <ClInclude Include="CollisionDetection\Ray\Ray.h" />
+    <ClInclude Include="Field\Field.h" />
+    <ClInclude Include="Light\Light.h" />
+    <ClInclude Include="NumberTexture\NumberTexture.h" />
+    <ClInclude Include="Scene\IScene.h" />
+    <ClInclude Include="Scene\SceneManager.h" />
+    <ClInclude Include="Scene\SceneNull\SceneNull.h" />
+    <ClInclude Include="World\IWorld.h" />
+    <ClInclude Include="World\World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
