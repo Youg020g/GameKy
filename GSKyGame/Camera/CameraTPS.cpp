@@ -4,9 +4,10 @@
 #include "../CollisionDetection/Line/Line.h"
 
 // プレーヤーからの相対座標
-const GSvector3 PlayerOffset{ 0.0f, 3.0f, -5.0f };
-// カメラの注視点の補正値
-const GSvector3 ReferencePointOffset{ 0.0f, 1.7, 0.0f };
+const GSvector3 PlayerOffset{ 0.0f, 2.0f, -4.0f };
+// カメラの注視からの補正値
+const GSvector3 ReferencePointOffset{ 0.0f, 1.0f, 0.0f };
+
 
 CameraTPS::CameraTPS(IWorld* world, const GSvector3& position, const GSvector3& target) {
     // ワールドを設定
