@@ -4,6 +4,7 @@
 #include "../../Light/Light.h"
 #include "../../Camera/CameraTPS.h"
 #include "../../AssetsID/Assets.h"
+#include "../../Actor/Enemy/Enemy.h"
 
 // 開始
 void GamePlayScene::start() {
@@ -36,6 +37,12 @@ void GamePlayScene::start() {
 
 // 更新
 void GamePlayScene::update(float delta_time) {
+
+    // テスト用にZキーを押したら敵を生成するようにする
+    if (gsGetKeyTrigger(GKEY_Z)) {
+        world_.add_actor(new Enemy{ &world_, GSvector3{0.0f, 0.0f, 20.0f} });
+    }
+
     world_.update(delta_time);
 }
 

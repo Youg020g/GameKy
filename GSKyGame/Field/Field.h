@@ -32,6 +32,10 @@ public:
 	Field(const Field& other) = default;
 	Field& operator = (const Field& other) = delete;
 
+	//グラウンドの広さ
+	GSvector3 ground_max{ 20.0f,0.0f,20.0f };
+	GSvector3 ground_min{ -20.0f,0.0f,-20.0f };
+
 private:
 	// 描画用オクトリー
 	GSuint octree_;

@@ -190,9 +190,7 @@ void Player::collide_field() {
     }
 
     //グラウンド外に出ないようにクランプ
-    GSvector3 area_control_min = {-20.0f , -FootOffset ,-20.0f};
-    GSvector3 area_control_max = { 20.0f , -FootOffset , 20.0f };
-    position = position.clamp(area_control_min, area_control_max);
+    position = position.clamp(world_->field()->ground_min, world_->field()->ground_max);
     // 座標を変更する
     transform_.position(position);
 }

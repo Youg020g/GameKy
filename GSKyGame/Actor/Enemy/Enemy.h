@@ -11,13 +11,13 @@ public:
     enum class State {
         Idle,			// アイドル中
         Walk,			// 歩き中
-        Turn,			// 振り向き中
         Damage,		// ダメージ中
-        Attack		// 攻撃中
+        Down,		// 攻撃中
+        Disappear   //消滅中
     };
 public:
     // コンストラクタ
-    Enemy(IWorld* world, const GSvector3& position, Actor* player);
+    Enemy(IWorld* world, const GSvector3& position);
     // 更新
     virtual void update(float delta_time) override;
     // 描画
@@ -37,6 +37,10 @@ private:
     void walk(float delta_time);
     // ダメージ中
     void damage(float delta_time);
+    //ダウン中
+    void down(float delta_time);
+    //消滅中
+    void disappear(float delta_time);
 
     // 移動判定
     bool is_walk() const;
@@ -47,6 +51,11 @@ private:
     float target_angle() const;
     // ターゲットの距離を求める
     float target_distance() const;
+
+    // フィールドとの衝突
+    void collide_field();
+    // アクターとの衝突処理
+    void collide_actor(Actor& other);
 
 private:
     // アニメーションメッシュ
