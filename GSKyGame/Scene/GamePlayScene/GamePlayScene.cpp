@@ -11,6 +11,10 @@ void GamePlayScene::start() {
     gsLoadMesh(Mesh_Player, "Assets/model/Kendo/kendo.msh");
     gsLoadSkeleton(Mesh_Player, "Assets/model/Kendo/kendo.skl");
     gsLoadAnimation(Mesh_Player, "Assets/model/Kendo/kendo.anm");
+    // 空手部長メッシュの読み込み
+    gsLoadMesh(Mesh_Enemy, "Assets/model/Karate/karate.msh");
+    gsLoadSkeleton(Mesh_Enemy, "Assets/model/Karate/karate.skl");
+    gsLoadAnimation(Mesh_Enemy, "Assets/model/Karate/karate.anm");
 
     // スカイボックスメッシュの読み込み
     gsLoadMesh(Mesh_Skybox, "Assets/model/sky/skydome.msh");
