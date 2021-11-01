@@ -3,16 +3,14 @@
 #include "../../Field/Field.h"
 #include "../../CollisionDetection/Line/Line.h"
 #include "../../AssetsID/Assets.h"
+#include "../AttackCollider/AttackCollider.h"
 
 // モーション番号
 enum {
     MotionIdle = 0,     // アイドル
-    MotionForwardWalk = 1,     // 前進
-    MotionBackwardWalk = 1,     // 後退
-    MotionLeftWalk = 1,     // 左歩き
-    MotionRightWalk = 1,     // 右歩き
+    MotionWalk = 1,     // 前進
     MotionDamage = 14,    // ダメ―ジ
-    MotionGetUp = 17,     // 起き上がり
+    MotionGetUp = 16,     // 起き上がり
     MotionAttack = 17    // 攻撃
 };
 
@@ -65,6 +63,7 @@ void Player::update(float delta_time) {
     mesh_.update(delta_time);
     // 行列を設定
     mesh_.transform(transform_.localToWorldMatrix());
+
 }
 
 // 描画
@@ -77,10 +76,16 @@ void Player::draw() const {
 
 // 衝突リアクション
 void Player::react(Actor& other) {
-    // ここに衝突判定の処理があるとする
+    // ダメージ中と起き上がり中は何もしない
+    if (state_ == State::Damage || state_ == State::GetUp) return;
+    // 敵と衝突したか？
+    if (other.tag() == "EnemyTag") {
+        // 衝突した場合は、ダメージ状態に変更
+        change_state(State::Damage, MotionDamage, false);
+        return;
+    }
 
-    // 衝突した場合は、ダメージ状態に変更
-    change_state(State::Damage, MotionDamage, false);
+   
 }
 
 // 状態の更新
@@ -90,6 +95,7 @@ void Player::update_state(float delta_time) {
     case State::Move:   move(delta_time);   break;
     case State::Attack: attack(delta_time); break;
     case State::Damage: damage(delta_time); break;
+    case State::GetUp: get_up(delta_time); break;
     }
     // 状態タイマの更新
     state_timer_ += delta_time;
@@ -105,8 +111,10 @@ void Player::change_state(State state, GSuint motion, bool loop) {
 
 // 移動処理
 void Player::move(float delta_time) {
-    // スペースキーで弾を撃つ
+    // スペースキーで攻撃
     if (gsGetKeyState(GKEY_SPACE)) {
+        // 攻撃判定を生成
+        generate_attack_collider();
         change_state(State::Attack, MotionAttack);
         return;
     }
@@ -119,20 +127,21 @@ void Player::move(float delta_time) {
     // WASD移動
     if (gsGetKeyState(GKEY_W)) {
         forward_speed = WalkSpeed;      // 前進
-        motion = MotionForwardWalk;
+        motion = MotionWalk;
     }
     else if (gsGetKeyState(GKEY_S)) {
         forward_speed = -WalkSpeed;     // 後退
-        motion = MotionBackwardWalk;
+        motion = MotionWalk;
     }
     else if (gsGetKeyState(GKEY_A)) {
         side_speed = WalkSpeed;        // 左移動
-        motion = MotionLeftWalk;
+        motion = MotionWalk;
     }
     else if (gsGetKeyState(GKEY_D)) {
         side_speed = -WalkSpeed;        // 右移動
-        motion = MotionRightWalk;
+        motion = MotionWalk;
     }
+    
     // 移動状態にする
     change_state(State::Move, motion);
 
@@ -159,6 +168,15 @@ void Player::attack(float delta_time) {
 void Player::damage(float delta_time) {
     // ダメージモーションの終了を待つ
     if (state_timer_ >= mesh_.motion_end_time()) {
+        move(delta_time);
+    }
+    // 衝突した場合は、起き上がり状態に変更
+    change_state(State::GetUp, MotionGetUp, false);
+}
+
+void Player::get_up(float delta_time){
+    // 起き上がりモーションの終了を待つ
+    if (state_timer_ >= mesh_.motion_end_time() ) {
         move(delta_time);
     }
 }
@@ -193,4 +211,49 @@ void Player::collide_field() {
     position = position.clamp(world_->field()->ground_min, world_->field()->ground_max);
     // 座標を変更する
     transform_.position(position);
+}
+
+// アクターとの衝突処理
+void Player::collide_actor(Actor& other) {
+    // ｙ座標を除く座標を求める
+    GSvector3 position = transform_.position();
+    position.y = 0.0f;
+    GSvector3 target = other.transform().position();
+    target.y = 0.0f;
+    // 相手との距離
+    float distance = GSvector3::distance(position, target);
+    // 衝突判定球の半径同士を加えた長さを求める
+    float length = collider_.radius + other.collider().radius;
+    // 衝突判定球の重なっている長さを求める
+    float overlap = length - distance;
+    // 重なっている部分の半分の距離だけ離れる移動量を求める
+    GSvector3 v = (position - target).getNormalized() * overlap * 0.5f;
+    transform_.translate(v, GStransform::Space::World);
+    // フィールドとの衝突判定
+    collide_field();
+}
+
+// 攻撃判定を生成する
+void Player::generate_attack_collider() {
+    // 攻撃判定を出現させる場所の距離
+    const float AttackColliderDistance{ 1.5f };
+    // 攻撃判定の半径
+    const float AttackColliderRadius{ 1.0f };
+    // 攻撃判定を出す場所の高さ
+    const float AttackColliderHeight{ 1.0f };
+
+    // 攻撃判定が有効になるまでの遅延時間
+    const float AttackCollideDelay{ 15.0f };
+    // 攻撃判定の寿命
+    const float AttackCollideLifeSpan{ 5.0f };
+
+    // 衝突判定を出現させる座標を求める（前方の位置）
+    GSvector3 position = transform_.position() + transform_.forward() * AttackColliderDistance;
+    // 高さの補正（足元からの高さ）
+    position.y += AttackColliderHeight;
+    // 衝突判定用の球を作成
+    BoundingSphere collider{ AttackColliderRadius, position };
+    // 衝突判定を出現させる
+    world_->add_actor(new AttackCollider{ world_, collider,
+        "PlayerAttackTag", "PlayerAttack", tag_, AttackCollideLifeSpan, AttackCollideDelay });
 }

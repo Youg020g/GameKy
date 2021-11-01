@@ -15,9 +15,9 @@ enum {
 };
 
 // 移動判定の距離
-const float WalkDistance{ 10.0f };
+const float WalkDistance{ 20.0f };
 // 移動スピード
-const float WalkSpeed{ 0.025f };
+const float WalkSpeed{ 0.05f };
 // 振り向く角度
 const float TurnAngle{ 2.5f };
 
@@ -52,6 +52,11 @@ Enemy::Enemy(IWorld* world, const GSvector3& position) :
     // メッシュの変換行列を初期化
     mesh_.transform(transform_.localToWorldMatrix());
 
+    // プレーヤーを検索する
+    Actor* player = world_->find_actor("Player");
+    if (player != nullptr) {
+       transform().lookAt(player->transform().position());
+    }
 }
 
 // 更新
@@ -88,28 +93,11 @@ void Enemy::react(Actor& other) {
     // ダメージ中またはダウン中の場合は何もしない
     if (state_ == State::Damage || state_ == State::Down) return;
     // プレーヤーの弾に衝突した
-    if (other.tag() == "PlayerTag") {
+    if (other.tag() == "PlayerTag" || "PlayerAttackTag") {
        // 残りの体力がなければダウン状態に遷移
        change_state(State::Down, MotionDown, false);
        return;
-
-        //if (health_ <= 0) {
-        //    // 残りの体力がなければダウン状態に遷移
-        //    change_state(State::Down, MotionDown, false);
-        //}
-        //else {
-        //    // 弾の進行方向にノックバックする移動量を求める
-        //    velocity_ = other.velocity().getNormalized() * 0.5f;
-        //    // ダメージ状態に遷移
-        //    change_state(State::Damage, MotionDamage, false);
-        //}
-      
     }
-    // プレーヤーまたは敵に衝突した
-    if (other.tag() == "PlayerTag" || other.tag() == "EnemyTag") {
-        collide_actor(other);
-    }
-
 }
 
 // 状態の更新
@@ -153,10 +141,10 @@ void Enemy::idle(float delta_time) {
 
 // 移動中
 void Enemy::walk(float delta_time) {
-    // ターゲット方向の角度を求める　(少しずつ向きを変えるように角度を制限する）
-    float angle = CLAMP(target_signed_angle(), -TurnAngle, TurnAngle);
-    // ターゲット方向を向く
-    transform_.rotate(0.0f, angle * delta_time, 0.0f);
+    //// ターゲット方向の角度を求める　(少しずつ向きを変えるように角度を制限する）
+    //float angle_player_ = CLAMP(target_signed_angle(), -TurnAngle, TurnAngle);
+    //// ターゲット方向を向く
+    //transform_.rotate(0.0f, angle * delta_time, 0.0f);
     // 前進する（ローカル座標基準）
     transform_.translate(0.0f, 0.0f, WalkSpeed * delta_time);
 }
@@ -188,29 +176,29 @@ void Enemy::disappear(float delta_time){
 // 移動判定
 bool Enemy::is_walk() const {
     // 移動距離内かつ前方向と前向き方向のベクトルとターゲット方向のベクトルの角度差が100.0度以下か？
-    return (target_distance() <= WalkDistance) && (target_angle() <= 100.0f);
+    return (target_distance() <= WalkDistance);
 }
 
-// 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める（符号付き）
-float Enemy::target_signed_angle() const {
-    // ターゲットがいなければ0を返す
-    if (player_ == nullptr) return 0.0f;
-    // ターゲット方向のベクトルを求める
-    GSvector3 to_target = player_->transform().position() - transform_.position();
-    // 前向き方向のベクトルを取得
-    GSvector3 forward = transform_.forward();
-    // ベクトルのy成分を無効にする
-    forward.y = 0.0f;
-    to_target.y = 0.0f;
-    // 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める
-    return GSvector3::signedAngle(forward, to_target);
-
-}
-
-// 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める（符号なし）
-float Enemy::target_angle() const {
-    return std::abs(target_signed_angle());
-}
+//// 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める（符号付き）
+//float Enemy::target_signed_angle() const {
+//    // ターゲットがいなければ0を返す
+//    if (player_ == nullptr) return 0.0f;
+//    // ターゲット方向のベクトルを求める
+//    GSvector3 to_target = player_->transform().position() - transform_.position();
+//    // 前向き方向のベクトルを取得
+//    GSvector3 forward = transform_.forward();
+//    // ベクトルのy成分を無効にする
+//    forward.y = 0.0f;
+//    to_target.y = 0.0f;
+//    // 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める
+//    return GSvector3::signedAngle(forward, to_target);
+//
+//}
+//
+//// 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める（符号なし）
+//float Enemy::target_angle() const {
+//    return std::abs(target_signed_angle());
+//}
 
 // ターゲットとの距離を求める
 float Enemy::target_distance() const {

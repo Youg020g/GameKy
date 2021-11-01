@@ -45,10 +45,10 @@ private:
     // 移動判定
     bool is_walk() const;
 
-    // ターゲット方向の角度を求める（符号付き）
-    float target_signed_angle() const;
-    // ターゲット方向の角度を求める（符号なし）
-    float target_angle() const;
+    //// ターゲット方向の角度を求める（符号付き）
+    //float target_signed_angle() const;
+    //// ターゲット方向の角度を求める（符号なし）
+    //float target_angle() const;
     // ターゲットの距離を求める
     float target_distance() const;
 
@@ -70,6 +70,8 @@ private:
     float		state_timer_;
     // プレーヤー
     Actor* player_;
+    //プレイヤーの向き
+    float angle_player_;
 };
 
 #endif

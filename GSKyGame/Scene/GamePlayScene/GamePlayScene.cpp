@@ -40,7 +40,7 @@ void GamePlayScene::update(float delta_time) {
 
     // テスト用にZキーを押したら敵を生成するようにする
     if (gsGetKeyTrigger(GKEY_Z)) {
-        world_.add_actor(new Enemy{ &world_, GSvector3{0.0f, 0.0f, 20.0f} });
+        world_.add_actor(new Enemy{ &world_, GSvector3{0.0f, 0.0f, -20.0f} });
     }
 
     world_.update(delta_time);

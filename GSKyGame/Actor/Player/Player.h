@@ -11,7 +11,9 @@ public:
     enum class State {
         Move,			// 移動中
         Attack,		// 攻撃中
-        Damage		// ダメージ中
+        Damage,		// ダメージ中
+        Down,        //ダウン
+        GetUp       //起き上がり中
     };
 
 public:
@@ -35,9 +37,16 @@ private:
     void attack(float delta_time);
     // ダメージ中
     void damage(float delta_time);
+    //起き上がり中
+    void get_up(float delta_time);
 
     // フィールドとの衝突処理
     void collide_field();
+    // アクターとの衝突処理
+    void collide_actor(Actor& other);
+    // 攻撃判定を生成
+    void generate_attack_collider();
+
 
 private:
     // アニメーションメッシュ
