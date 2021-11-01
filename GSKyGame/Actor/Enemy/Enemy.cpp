@@ -55,7 +55,9 @@ Enemy::Enemy(IWorld* world, const GSvector3& position) :
     // プレーヤーを検索する
     Actor* player = world_->find_actor("Player");
     if (player != nullptr) {
-       transform().lookAt(player->transform().position());
+       angle_player_ = player->transform().position();
+       angle_player_.y = FootOffset;
+       transform().lookAt(angle_player_);
     }
 }
 
@@ -91,11 +93,11 @@ void Enemy::draw() const {
 // 衝突処理
 void Enemy::react(Actor& other) {
     // ダメージ中またはダウン中の場合は何もしない
-    if (state_ == State::Damage || state_ == State::Down) return;
+    if (state_ == State::Damage || state_ == State::Down || state_ == State::Disappear) return;
     // プレーヤーの弾に衝突した
-    if (other.tag() == "PlayerTag" || "PlayerAttackTag") {
+    if (other.tag() == "PlayerTag" || other.tag() == "PlayerAttackTag") {
        // 残りの体力がなければダウン状態に遷移
-       change_state(State::Down, MotionDown, false);
+       change_state(State::Damage, MotionDamage, false);
        return;
     }
 }
@@ -141,16 +143,13 @@ void Enemy::idle(float delta_time) {
 
 // 移動中
 void Enemy::walk(float delta_time) {
-    //// ターゲット方向の角度を求める　(少しずつ向きを変えるように角度を制限する）
-    //float angle_player_ = CLAMP(target_signed_angle(), -TurnAngle, TurnAngle);
-    //// ターゲット方向を向く
-    //transform_.rotate(0.0f, angle * delta_time, 0.0f);
     // 前進する（ローカル座標基準）
     transform_.translate(0.0f, 0.0f, WalkSpeed * delta_time);
 }
 
 // ダメージ中
 void Enemy::damage(float delta_time) {
+    enable_collider_ = false;
     // ダメージモーション中か？
     if (state_timer_ < mesh_.motion_end_time()) {
         // ノックバックする
@@ -159,7 +158,7 @@ void Enemy::damage(float delta_time) {
         return;
     }
 
-    idle(delta_time);
+    change_state(State::Down, MotionDown, false);
 }
 
 void Enemy::down(float delta_time){
@@ -170,7 +169,11 @@ void Enemy::down(float delta_time){
 }
 
 void Enemy::disappear(float delta_time){
-
+    enable_collider_ = false;
+    if (state_timer_ >= mesh_.motion_end_time()) {
+        // 消滅モーションが終了したら死亡 
+        die();
+    }
 }
 
 // 移動判定
@@ -178,27 +181,6 @@ bool Enemy::is_walk() const {
     // 移動距離内かつ前方向と前向き方向のベクトルとターゲット方向のベクトルの角度差が100.0度以下か？
     return (target_distance() <= WalkDistance);
 }
-
-//// 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める（符号付き）
-//float Enemy::target_signed_angle() const {
-//    // ターゲットがいなければ0を返す
-//    if (player_ == nullptr) return 0.0f;
-//    // ターゲット方向のベクトルを求める
-//    GSvector3 to_target = player_->transform().position() - transform_.position();
-//    // 前向き方向のベクトルを取得
-//    GSvector3 forward = transform_.forward();
-//    // ベクトルのy成分を無効にする
-//    forward.y = 0.0f;
-//    to_target.y = 0.0f;
-//    // 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める
-//    return GSvector3::signedAngle(forward, to_target);
-//
-//}
-//
-//// 前向き方向のベクトルとターゲット方向のベクトルの角度差を求める（符号なし）
-//float Enemy::target_angle() const {
-//    return std::abs(target_signed_angle());
-//}
 
 // ターゲットとの距離を求める
 float Enemy::target_distance() const {
@@ -232,6 +214,10 @@ void Enemy::collide_field(){
         velocity_.y = 0.0f;
     }
 
+    if ( state_ != State::Disappear && ( world_->field()->ground_min >= transform_.position() || world_->field()->ground_max <= position)) {
+        //遷移
+        change_state(State::Disappear, MotionDisappear, false);
+    }
 }
 
 void Enemy::collide_actor(Actor& other){

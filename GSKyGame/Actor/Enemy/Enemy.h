@@ -71,7 +71,7 @@ private:
     // プレーヤー
     Actor* player_;
     //プレイヤーの向き
-    float angle_player_;
+   GSvector3 angle_player_;
 };
 
 #endif
