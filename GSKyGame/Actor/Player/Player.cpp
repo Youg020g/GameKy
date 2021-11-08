@@ -169,9 +169,8 @@ void Player::damage(float delta_time) {
     // ダメージモーションの終了を待つ
     if (state_timer_ >= mesh_.motion_end_time()) {
         move(delta_time);
+        change_state(State::GetUp, MotionGetUp, false);
     }
-    // 衝突した場合は、起き上がり状態に変更
-    change_state(State::GetUp, MotionGetUp, false);
 }
 
 void Player::get_up(float delta_time){

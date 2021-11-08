@@ -214,7 +214,8 @@ void Enemy::collide_field(){
         velocity_.y = 0.0f;
     }
 
-    if ( state_ != State::Disappear && ( world_->field()->ground_min >= transform_.position() || world_->field()->ground_max <= position)) {
+    if ( state_ != State::Disappear && ( world_->field()->ground_min >= transform_.position() 
+        || world_->field()->ground_max <= transform_.position() || transform_.position().z >= 20.0f)) {
         //‘JˆÚ
         change_state(State::Disappear, MotionDisappear, false);
     }
