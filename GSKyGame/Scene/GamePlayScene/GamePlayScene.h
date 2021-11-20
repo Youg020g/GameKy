@@ -3,6 +3,7 @@
 
 #include "../IScene.h"
 #include "../../World/World.h"
+#include "../../Result/Result.h"
 
 // ゲームプレイシーン
 class GamePlayScene : public IScene {
@@ -20,8 +21,27 @@ public:
     // 終了
     virtual void end() override;
 private:
+    // ゲーム中状態の更新
+    void update_playing(float delta_time);
+    // リザルト状態の更新
+    void update_result(float delta_time);
+
+private:
+    // ゲームプレイシーンの状態
+    enum class State {
+        Playing,    // ゲームプレイ中
+        Result      // リザルト中
+    };
+    // 状態
+    State   state_{ State::Playing };
     // ワールドクラス
     World   world_;
+    // リザルト
+    Result  result_;
+    // リザルト用タイマ
+    float   result_timer_{ 0.0f };
+    // 終了フラグ
+    bool    is_end_{ false };
 };
 
 #endif

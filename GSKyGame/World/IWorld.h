@@ -39,6 +39,9 @@ public:
     virtual Actor* camera() = 0;
     // ライトの取得
     virtual Actor* light() = 0;
+    // スコアの加算
+    virtual void add_score(int score) = 0;
+
 };
 
 #endif

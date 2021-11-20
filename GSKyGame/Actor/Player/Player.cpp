@@ -84,8 +84,6 @@ void Player::react(Actor& other) {
         change_state(State::Damage, MotionDamage, false);
         return;
     }
-
-   
 }
 
 // ó‘Ô‚ÌXV

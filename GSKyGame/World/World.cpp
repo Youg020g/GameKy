@@ -19,12 +19,15 @@ void World::update(float delta_time) {
     actors_.late_update(delta_time);
     // アクターの消去
     actors_.remove();
+    // タイマの更新
+    timer_.update(delta_time);
     // カメラの更新
     camera_->update(delta_time);
     // ライトの更新
     light_->update(delta_time);
-
-    if (start_game_over_) {
+    
+    
+    if (timer_.is_timeout()) {
         game_over_timer_ += delta_time;
 
         if (game_over_timer_ >= 120) {
@@ -50,7 +53,10 @@ void World::draw() const {
     actors_.draw_transparent();
     // GUIの描画
     actors_.draw_gui();
-
+    // スコアの描画
+    score_.draw();
+    // タイマの描画
+    timer_.draw();
 }
 
 // 消去
@@ -73,6 +79,8 @@ void World::clear() {
     // フィールドを消去
     delete field_;
     field_ = nullptr;
+    // スコアの消去
+    score_.clear();
 }
 
 // カメラの追加
@@ -91,6 +99,16 @@ void World::add_light(Actor* light) {
 void World::add_field(Field* field) {
     delete field_;	// 現在のフィールドを削除
     field_ = field;
+}
+
+// スコアの加算
+void World::add_score(int score) {
+    score_.add(score);
+}
+
+// タイマの取得
+Timer& World::timer() {
+    return timer_;
 }
 
 // アクターの追加

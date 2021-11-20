@@ -1,17 +1,25 @@
 #include <GSgame.h>
 #include "Scene/SceneManager.h"
+#include "Scene/TitleScene/TitleScene.h"
 #include "Scene/GamePlayScene/GamePlayScene.h"
+
 
 // マイゲームクラス
 class MyGame : public gslib::Game {
+    // シーンマネージャー
+    SceneManager scene_maneger_;
 public:
     // コンストラクタ
     MyGame() : gslib::Game{ 1024, 768 } {
     }
     // 開始
     void start() override {
+        // タイトルシーンの追加
+        scene_maneger_.add("TitleScene", new TitleScene());
+        // ゲームプレイシーンの追加
         scene_maneger_.add("GamePlayScene", new GamePlayScene());
-        scene_maneger_.change("GamePlayScene");
+        // タイトルシーンから開始
+        scene_maneger_.change("TitleScene");
     }
     // 更新
     void update(float delta_time) {
@@ -26,9 +34,7 @@ public:
         scene_maneger_.end();
     }
 
-private:
-    // シーンマネージャー
-    SceneManager scene_maneger_;
+
 };
 
 // main関数

@@ -96,6 +96,8 @@ void Enemy::react(Actor& other) {
     if (state_ == State::Damage || state_ == State::Down || state_ == State::Disappear) return;
     // プレーヤーの弾に衝突した
     if (other.tag() == "PlayerTag" || other.tag() == "PlayerAttackTag") {
+        //攻撃判定に当たっていればスコア追加
+        if (other.tag() == "PlayerAttackTag")world_->add_score(1);
        // 残りの体力がなければダウン状態に遷移
        change_state(State::Damage, MotionDamage, false);
        return;
@@ -215,7 +217,7 @@ void Enemy::collide_field(){
     }
 
     if ( state_ != State::Disappear && ( world_->field()->ground_min >= transform_.position() 
-        || world_->field()->ground_max <= transform_.position() || transform_.position().z >= 20.0f)) {
+        || world_->field()->ground_max <= transform_.position() || transform_.position().z <= -20.0f ||transform_.position().z >= 20.0f)) {
         //遷移
         change_state(State::Disappear, MotionDisappear, false);
     }
@@ -238,5 +240,4 @@ void Enemy::collide_actor(Actor& other){
     transform_.translate(v, GStransform::Space::World);
     // フィールドとの衝突判定
     collide_field();
-
 }

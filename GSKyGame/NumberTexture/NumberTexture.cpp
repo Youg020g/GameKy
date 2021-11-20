@@ -1,28 +1,38 @@
-#ifndef NUMBER_TEXTURE_H_
-#define NUMBER_TEXTURE_H_
+#include "NumberTexture.h"
+#include <sstream>
+#include <iomanip>
 
-#include <gslib.h>
-#include <string>
+// コンストラクタ
+NumberTexture::NumberTexture(GSuint texture, int width, int height) :
+    texture_{ texture }, width_{ width }, height_{ height } {
+}
 
-// ナンバテクスチャ
-class NumberTexture {
-public:
-    // コンストラクタ
-    NumberTexture(GSuint texture, int width, int height);
-    // 描画(右詰め)
-    void draw(const GSvector2& position, int num, int digit, char fill = '0') const;
-    // 描画(左詰め)
-    void draw(const GSvector2& position, int num) const;
-    // 描画
-    void draw(const GSvector2& position, const std::string& num) const;
+// 描画
+void NumberTexture::draw(const GSvector2& position, int num, int digit, char fill, const GScolor& color) const {
+    std::stringstream ss;
+    ss << std::setw(digit) << std::setfill(fill) << num;
+    draw(position, ss.str(), color);
+}
 
-private:
-    // フォント用のテクスチャ
-    GSuint	texture_;
-    // 文字の幅
-    int	width_;
-    // 文字の高さ
-    int	height_;
-};
+// 描画
+void NumberTexture::draw(const GSvector2& position, int num, const GScolor& color) const {
+    draw(position, std::to_string(num), color);
+}
 
-#endif
+// 描画
+void NumberTexture::draw(const GSvector2& position, const std::string& num, const GScolor& color) const {
+    for (int i = 0; i < (int)num.size(); ++i) {
+        if (num[i] == ' ') continue;
+        const int n = (num[i] != '.') ? num[i] - '0' : 10; // 小数点は9の次にあることを前提
+        const GSrect rect(n * width_, 0.0f, (n * width_) + width_, height_);
+        const GSvector2 pos{ position.x + i * width_, position.y };
+        gsDrawSprite2D(texture_, &pos, &rect, NULL, &color, NULL, 0);
+    }
+}
+
+void NumberTexture::score_text_texture (const GSvector2& position, const GScolor& color) const {
+    // 数字に対応する画像を切り出すための矩形を計算する
+    GSrect rect(0.0f, 64.0f, 128.0f, 128.0f);
+    // 数字を１桁描画
+    gsDrawSprite2D(texture_, &position, &rect, NULL, &color, NULL, 0);
+}

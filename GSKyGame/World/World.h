@@ -3,6 +3,8 @@
 
 #include "IWorld.h"
 #include "../Actor/ActorManager.h"
+#include "../Score/Score.h"
+#include "../Timer/Timer.h"
 
 // ワールドクラス
 class World : public IWorld {
@@ -23,6 +25,10 @@ public:
     void add_light(Actor* light);
     // フィールドの追加
     void add_field(Field* field);
+    // スコアの加算
+    virtual void add_score(int score) override;
+    // タイマの取得
+    Timer& timer();
 
     // アクターを追加
     virtual void add_actor(Actor* actor) override;
@@ -59,6 +65,10 @@ public:
     World(const World& other) = delete;
     World& operator = (const World& other) = delete;
 
+
+public:
+    // スコア
+    Score		score_;
 private:
     // アクターマネージャー
     ActorManager  actors_;
@@ -68,6 +78,9 @@ private:
     Actor* camera_{ nullptr };
     // フィールド
     Field* field_{ nullptr };
+
+    // タイマ
+    Timer         timer_{ 60.0f };
 
     //ゲームオーバーか？
     bool         is_game_over_{ false };
