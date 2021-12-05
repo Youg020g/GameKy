@@ -6,6 +6,8 @@
 #include "../../AssetsID/Assets.h"
 #include "../../Actor/Enemy/Enemy.h"
 #include "../../Actor/EnemyGenerator/EnemyGenerator.h"
+#include "../../Actor/Radar/Radar.h"
+#include <GSmusic.h>
 
 
 // 開始
@@ -41,6 +43,35 @@ void GamePlayScene::start() {
     // 開始ボタンを押忍の読み込み
     gsLoadTexture(Texture_Start, "Assets/texture/osu.png");
 
+    // レーダーの背景の画像を読み込み
+    gsLoadTexture(Texture_Radar, "Assets/texture/radar.png");
+    // レーダーの点の画像を読み込み
+    gsLoadTexture(Texture_RadarPoint, "Assets/texture/pt.png");
+
+    // ゲーム開始時の効果音の読み込み
+    gsLoadSE(Se_GameStart, "Assets/sound/Select.wav", 1, GWAVE_DEFAULT);
+    // 剣道部長攻撃時効果音の読み込み
+    gsLoadSE(Se_PlayerAttack, "Assets/sound/Attack1.wav", 1, GWAVE_DEFAULT);
+    // 剣道部長ダメージ効果音の読み込み
+    gsLoadSE(Se_PlayerDamage, "Assets/sound/Damage2.wav", 1, GWAVE_DEFAULT);
+    // 空手部長ダメージ効果音の読み込み
+    gsLoadSE(Se_EnemeyDamage, "Assets/sound/Attack2.wav", 1, GWAVE_DEFAULT);
+    // タイムアウトの効果音の読み込み
+    gsLoadSE(Se_Timeout, "Assets/sound/timeend.wav", 1, GWAVE_DEFAULT);
+
+    // ゲームプレイ中用BGMの読み込み
+    gsLoadMusic(Sound_PlayingBGM, "Assets/sound/kendo.wav", GS_TRUE);
+    // リザルト用BGMの読み込み
+    gsLoadMusic(Sound_ResultBGM, "Assets/sound/ed.wav", GS_TRUE);
+
+    // BGMのバインド
+    gsBindMusic(Sound_PlayingBGM);
+    // BGMの再生
+    gsPlayMusic();
+    // 開始効果音（いくぜ！の掛け声）
+    gsPlaySE(Se_GameStart);
+
+
     // フィールドクラスの追加
     world_.add_field(new Field{ Octree_Koutei, Octree_KouteiCollider, Mesh_Skybox });
     // カメラクラスの追加
@@ -48,6 +79,8 @@ void GamePlayScene::start() {
               &world_,GSvector3{ 0.0f, 2.0f, -4.0f }, GSvector3{ 0.0f, 1.0f, 0.0f } });
     // ライトクラスの追加
     world_.add_light(new Light{ &world_ });
+    // レーダークラスを追加
+    world_.add_actor(new Radar{ &world_ });
     // プレーヤーを追加
     world_.add_actor(new Player{ &world_, GSvector3{ 0.0f, 0.0f, 0.0f } });
     //エネミー生成クラス
@@ -87,6 +120,14 @@ void GamePlayScene::update_playing(float delta_time) {
     world_.update(delta_time);
     // ゲームオーバーになったらリザルト状態に遷移
     if (world_.is_game_over()) {
+        // タイムアウトの効果音を再生
+        gsPlaySE(Se_Timeout);
+        // BGMを停止
+        gsStopMusic();
+        // リザルトシーン用のBGMを再生
+        gsBindMusic(Sound_ResultBGM);
+        gsPlayMusic();
+
         // 点数を追加
         result_.add_score(world_.score_.get());
         // リザルト中タイマを初期化
@@ -138,6 +179,8 @@ std::string GamePlayScene::next() const {
 
 // 終了
 void GamePlayScene::end() {
+    // BGMの停止
+    gsStopMusic();
     // ランキングファイルの保存
     result_.save("Assets/ranking.txt");
     // ワールドを消去
@@ -157,5 +200,14 @@ void GamePlayScene::end() {
     gsDeleteTexture(Texture_Result1);
     gsDeleteTexture(Texture_Result2);
     gsDeleteTexture(Texture_Start);
+    gsDeleteTexture(Texture_Radar); 
+    gsDeleteTexture(Texture_RadarPoint);
+    gsDeleteMusic(Sound_PlayingBGM);
+    gsDeleteMusic(Sound_ResultBGM);
+    gsDeleteSE(Se_GameStart);
+    gsDeleteSE(Se_PlayerAttack);
+    gsDeleteSE(Se_PlayerDamage);
+    gsDeleteSE(Se_EnemeyDamage);
+    gsDeleteSE(Se_Timeout);
 
 }

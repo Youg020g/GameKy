@@ -26,4 +26,19 @@ enum {                      // テクスチャデータ
     Texture_RadarPoint      // レーダーの点
 };
 
+enum {
+    Sound_TitleBGM,         // タイトルシーン用ＢＧＭ 
+    Sound_PlayingBGM,       // ゲームシーン用のＢＧＭ 
+    Sound_ResultBGM         // リザルト用ＢＧＭ 
+};
+
+enum {
+    Se_GameStart,           // ゲーム開始時の効果音
+    Se_PlayerAttack,        // 剣道部長 攻撃時効果音
+    Se_PlayerDamage,        // 剣道部長 やられ効果音
+    Se_EnemeyDamage,        // 空手部部長 やられ効果音
+    Se_Timeout              // タイムアウトの効果音   
+};
+
+
 #endif

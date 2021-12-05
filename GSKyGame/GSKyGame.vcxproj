@@ -149,6 +149,7 @@
     <ClCompile Include="Actor\EnemyGenerator\EnemyGenerator.cpp" />
     <ClCompile Include="Actor\Enemy\Enemy.cpp" />
     <ClCompile Include="Actor\Player\Player.cpp" />
+    <ClCompile Include="Actor\Radar\Radar.cpp" />
     <ClCompile Include="Animation\AnimatedMesh\AnimatedMesh.cpp" />
     <ClCompile Include="Camera\CameraTPS.cpp" />
     <ClCompile Include="CollisionDetection\BoundingSphere\BoundingSphere.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Actor\EnemyGenerator\EnemyGenerator.h" />
     <ClInclude Include="Actor\Enemy\Enemy.h" />
     <ClInclude Include="Actor\Player\Player.h" />
+    <ClInclude Include="Actor\Radar\Radar.h" />
     <ClInclude Include="Animation\AnimatedMesh\AnimatedMesh.h" />
     <ClInclude Include="AssetsID\Assets.h" />
     <ClInclude Include="Camera\CameraTPS.h" />

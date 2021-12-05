@@ -1,5 +1,6 @@
 #include "TitleScene.h"
 #include "../../AssetsID/Assets.h"
+#include <GSmusic.h>
 
 // キャラクター画像の移動時間
 const float MovingTime{ 30.0f };
@@ -11,6 +12,15 @@ void TitleScene::start() {
     gsLoadTexture(Texture_Kendo, "Assets/texture/mini_kendo.png");
     gsLoadTexture(Texture_Karate, "Assets/texture/mini_karate.png");
     gsLoadTexture(Texture_Start, "Assets/texture/osu.png");
+
+    // タイトルシーン用BGMの読み込み
+    gsLoadMusic(Sound_TitleBGM, "Assets/sound/title.wav", GS_TRUE);
+
+    // BGMのバインド
+    gsBindMusic(Sound_TitleBGM);
+    // BGMの再生
+    gsPlayMusic();
+
 
     // 終了フラグの初期化
     is_end_ = false;
@@ -87,11 +97,14 @@ std::string TitleScene::next() const {
 
 // 終了
 void TitleScene::end() {
+    // BGMの停止
+    gsStopMusic();
     // 画像の削除
     gsDeleteTexture(Texture_Title);
     gsDeleteTexture(Texture_Kendo);
     gsDeleteTexture(Texture_Karate);
     gsDeleteTexture(Texture_Start);
+    gsDeleteMusic(Sound_TitleBGM);
 
 }
 

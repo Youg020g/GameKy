@@ -80,6 +80,8 @@ void Player::react(Actor& other) {
     if (state_ == State::Damage || state_ == State::GetUp) return;
     // 敵と衝突したか？
     if (other.tag() == "EnemyTag") {
+        // ダメージ効果音を再生
+        gsPlaySE(Se_PlayerDamage);
         // 衝突した場合は、ダメージ状態に変更
         change_state(State::Damage, MotionDamage, false);
         return;
@@ -111,6 +113,8 @@ void Player::change_state(State state, GSuint motion, bool loop) {
 void Player::move(float delta_time) {
     // スペースキーで攻撃
     if (gsGetKeyState(GKEY_SPACE)) {
+        // 攻撃効果音を再生
+        gsPlaySE(Se_PlayerAttack);
         // 攻撃判定を生成
         generate_attack_collider();
         change_state(State::Attack, MotionAttack);

@@ -96,6 +96,8 @@ void Enemy::react(Actor& other) {
     if (state_ == State::Damage || state_ == State::Down || state_ == State::Disappear) return;
     // プレーヤーの弾に衝突した
     if (other.tag() == "PlayerTag" || other.tag() == "PlayerAttackTag") {
+        // ダメージ効果音を再生
+        gsPlaySE(Se_EnemeyDamage);
         //攻撃判定に当たっていればスコア追加
         if (other.tag() == "PlayerAttackTag")world_->add_score(1);
        // 残りの体力がなければダウン状態に遷移
